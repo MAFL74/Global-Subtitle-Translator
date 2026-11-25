@@ -33,7 +33,7 @@ Jellyfin plugin builds must include `meta.json` beside the assemblies. `manifest
 Add this manifest in Jellyfin Dashboard → Plugins → Repositories:
 
 ```text
-https://raw.githubusercontent.com/MAFL74/Global-Subtitle-Translator/main/manifest.json
+https://raw.githubusercontent.com/MAFL74/Global-Subtitle-Translator/refs/heads/main/manifest.json
 ```
 
 After saving the repository, refresh the plugin catalog. Jellyfin can then show the plugin owner and repository and resolve package details for GST. The repository contains a Jellyfin package for version 1.5.22.0 under `releases/`.
