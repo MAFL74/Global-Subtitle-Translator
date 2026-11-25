@@ -6,7 +6,7 @@
   "overview": "Local offline subtitle translation for Jellyfin.",
   "owner": "MAFL74",
   "category": "General",
-  "imageUrl": "https://raw.githubusercontent.com/MAFL74/Global-Subtitle-Translator/refs/heads/main/assets/gst-logo-v2.png",
+  "imageUrl": "https://raw.githubusercontent.com/MAFL74/Global-Subtitle-Translator/refs/heads/main/assets/gst-logo-v3.png",
   "versions": [
     {
       "version": "1.5.22.0",

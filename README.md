@@ -7,7 +7,7 @@ Global Subtitle Translator (GST) is a Jellyfin plugin and companion Windows app 
 - `jellyfin-plugin/` — Jellyfin plugin, shared .NET code, and resilience-check source.
 - `worker/` — local CPU and CUDA worker implementations and the GPU worker dashboard.
 - `local-gst/` — Windows WPF app and Python translation engine.
-- `assets/gst-logo-v2.png` — GST plugin logo.
+- `assets/gst-logo-v3.png` — GST plugin catalog logo.
 
 The plugin extracts text subtitles from MKV files, sends subtitle text to a configured local worker, and writes an external SRT beside the media file. It does not upload video or subtitle data to a hosted translation API. The Windows app can use configured subtitle providers for subtitle search/download; that is separate from local translation.
 
