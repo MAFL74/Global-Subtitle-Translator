@@ -36,3 +36,8 @@ secrets/
 **/*.bak
 **/*.bak-*
 **/*.zip
+
+# Versioned Jellyfin plugin package referenced by manifest.json
+releases/1.5.22.0/
+!releases/
+!releases/*.zip

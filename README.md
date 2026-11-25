@@ -26,7 +26,17 @@ dotnet restore .\jellyfin-plugin\src\Gst.Plugin\Gst.Plugin.csproj -p:EnableGoogl
 dotnet publish .\jellyfin-plugin\src\Gst.Plugin\Gst.Plugin.csproj -c Release -p:EnableGoogleProvider=false -o .\publish\jellyfin-plugin
 ```
 
-The published plugin folder needs Jellyfin's plugin metadata file (`meta.json`) alongside the assemblies. Release packaging and the Jellyfin manifest will be documented after the repository URL and release process are set.
+Jellyfin plugin builds must include `meta.json` beside the assemblies. `manifest.json` publishes the compatible package, checksum, owner, icon, and repository entry.
+
+## Install the plugin from the GST repository
+
+Add this manifest in Jellyfin Dashboard → Plugins → Repositories:
+
+```text
+https://raw.githubusercontent.com/MAFL74/Global-Subtitle-Translator/main/manifest.json
+```
+
+After saving the repository, refresh the plugin catalog. Jellyfin can then show the plugin owner and repository and resolve package details for GST. The repository contains a Jellyfin package for version 1.5.22.0 under `releases/`.
 
 ## Run the Windows app
 
@@ -39,6 +49,12 @@ dotnet run --project .\local-gst\Local-GST.csproj
 ```
 
 Install a compatible model separately and select its local folder in the app. Model files, credentials, logs, subtitles, and generated translation output are intentionally excluded from this repository.
+
+## Install the Windows GPU worker
+
+The GPU worker can run in the background at Windows startup without an open Command Prompt. See [the Windows GPU worker guide](docs/GPU-WORKER-WINDOWS.md). The installer creates a dedicated CUDA-enabled Python environment, checks that CUDA and the selected local model are available, adds a firewall rule limited to the Jellyfin server IP, and registers a restartable startup task.
+
+Translation runs locally from the model folder. The installer downloads Python packages from their package indexes, but it does not send subtitle text to a translation API or download a model.
 
 ## Security and privacy
 
