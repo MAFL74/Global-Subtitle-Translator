@@ -7,7 +7,7 @@ Global Subtitle Translator (GST) is a Jellyfin plugin and companion Windows app 
 - `jellyfin-plugin/` — Jellyfin plugin, shared .NET code, and resilience-check source.
 - `worker/` — local CPU and CUDA worker implementations and the GPU worker dashboard.
 - `local-gst/` — Windows WPF app and Python translation engine.
-- `assets/gst-logo-v3.png` — GST plugin catalog logo.
+- `assets/gst-logo-v4.png` — GST plugin catalog logo.
 
 The plugin extracts text subtitles from MKV files, sends subtitle text to a configured local worker, and writes an external SRT beside the media file. It does not upload video or subtitle data to a hosted translation API. The Windows app can use configured subtitle providers for subtitle search/download; that is separate from local translation.
 
@@ -33,7 +33,7 @@ Jellyfin plugin builds must include `meta.json` beside the assemblies. `manifest
 Add this manifest in Jellyfin Dashboard → Plugins → Repositories:
 
 ```text
-https://raw.githubusercontent.com/MAFL74/Global-Subtitle-Translator/refs/heads/main/manifest-v3.json
+https://raw.githubusercontent.com/MAFL74/Global-Subtitle-Translator/refs/heads/main/manifest-v4.json
 ```
 
 After saving the repository, refresh the plugin catalog. Jellyfin can then show the plugin owner and repository and resolve package details for GST. The repository contains a Jellyfin package for version 1.5.22.0 under `releases/`.
@@ -66,3 +66,4 @@ Translation runs locally from the model folder. The installer downloads Python p
 ## Project status
 
 This repository is the source for the GST project. Inclusion in Jellyfin's official plugin catalog is a separate review and release step and is not implied by publishing this source repository.
+
