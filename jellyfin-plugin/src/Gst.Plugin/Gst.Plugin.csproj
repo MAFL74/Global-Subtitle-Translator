@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <AssemblyName>Jellyfin.Plugin.GlobalSubtitleTranslator</AssemblyName>
+    <RootNamespace>Jellyfin.Plugin.GlobalSubtitleTranslator</RootNamespace>
+    <Version>1.5.22.0</Version>
+    <AssemblyVersion>1.5.22.0</AssemblyVersion>
+    <FileVersion>1.5.22.0</FileVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Jellyfin.Controller" Version="10.11.0" />
+    <PackageReference Include="Jellyfin.Model" Version="10.11.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="System.CodeDom" Version="7.0.0" />
+    <ProjectReference Include="..\Gst.Core\Gst.Core.csproj" AdditionalProperties="EnableGoogleProvider=false" />
+    <EmbeddedResource Include="Configuration\config.html" />
+  </ItemGroup>
+</Project>

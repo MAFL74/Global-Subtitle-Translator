@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Gst.Automation/Gst.Automation.csproj" />
+    <Project Path="src/Gst.Cli/Gst.Cli.csproj" />
+    <Project Path="src/Gst.Core/Gst.Core.csproj" />
+    <Project Path="src/Gst.GoogleTool/Gst.GoogleTool.csproj" />
+    <Project Path="src/Gst.MkvTool/Gst.MkvTool.csproj" />
+    <Project Path="src/Gst.TranslateTool/Gst.TranslateTool.csproj" />
+  </Folder>
+</Solution>

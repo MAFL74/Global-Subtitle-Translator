@@ -1,0 +1,38 @@
+# Build outputs
+publish/
+artifacts/
+**/bin/
+**/obj/
+**/.vs/
+**/__pycache__/
+**/.venv/
+**/venv/
+**/models/
+**/model-*/
+
+# Local configuration and credentials
+secrets/
+**/*.user
+**/*.override
+**/settings.json
+**/appsettings.*.json
+**/credentials*.json
+.env
+.env.*
+
+# Media and generated diagnostics
+**/*.mkv
+**/*.srt
+**/*.ass
+**/*.ssa
+**/*.vtt
+**/*.stats.json
+**/*.diagnostics.json
+**/*.report.json
+**/*.log
+**/*.err
+**/*.pid
+**/*.exit
+**/*.bak
+**/*.bak-*
+**/*.zip

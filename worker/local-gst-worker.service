@@ -1,0 +1,33 @@
+[Unit]
+Description=Local GST offline CPU translation worker
+Wants=network-online.target
+After=network-online.target docker.service
+
+[Service]
+Type=simple
+User=1000
+Group=1000
+Environment=HF_HUB_OFFLINE=1
+Environment=TRANSFORMERS_OFFLINE=1
+Environment=HF_DATASETS_OFFLINE=1
+Environment=HF_HOME=/opt/gst/cache
+Environment=TOKENIZERS_PARALLELISM=false
+Environment=OMP_NUM_THREADS=16
+Environment=MKL_NUM_THREADS=16
+WorkingDirectory=/opt/gst
+ExecStart=/opt/gst/venv/bin/python /opt/gst/gst_local_worker.py --queue-dir /var/lib/jellyfin/local-gst-jobs --engine /opt/gst/local_gst.py --model /opt/gst/models/opus-mt-eng-nor --cpu-threads 16 --batch-size 16 --beams 4
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=25
+KillMode=control-group
+UMask=0002
+Nice=10
+CPUWeight=50
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+NoNewPrivileges=true
+ReadWritePaths=/var/lib/jellyfin/local-gst-jobs /opt/gst/cache
+
+[Install]
+WantedBy=multi-user.target

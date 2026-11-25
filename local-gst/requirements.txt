@@ -1,0 +1,6 @@
+# Install PyTorch using the official selector for the CUDA-enabled Windows wheel.
+# This project deliberately does not install a CPU-only PyTorch build implicitly.
+transformers>=4.46,<5
+accelerate>=0.26
+sentencepiece>=0.2
+safetensors>=0.4

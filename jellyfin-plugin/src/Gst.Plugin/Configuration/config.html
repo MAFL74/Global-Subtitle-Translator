@@ -1,0 +1,618 @@
+<div data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button">
+  <style>
+    .pluginConfigurationPage .gst-routine .removeRoutine {
+      background: #d32f2f !important;
+      color: #fff !important;
+      border: 0 !important;
+    }
+
+    .pluginConfigurationPage .gst-routine .removeRoutine span {
+      color: #fff !important;
+    }
+
+    .pluginConfigurationPage #gstRunStatus {
+      margin: 1em 0;
+      padding: 1em;
+      background: #252525;
+      border-radius: 4px;
+    }
+
+    .pluginConfigurationPage #gstRunStatus h2 { margin-top: 0; }
+    .pluginConfigurationPage .gst-status-heading { display: flex; align-items: center; justify-content: space-between; gap: 1em; }
+    .pluginConfigurationPage .gst-debug-toggle { margin: 0; }
+    .pluginConfigurationPage .gst-debug-only[hidden] { display: none !important; }
+    .pluginConfigurationPage .gst-status-grid {
+      display: grid;
+      grid-template-columns: minmax(9em, 12em) minmax(0, 1fr);
+      gap: .55em 1em;
+      margin-top: .8em;
+    }
+    .pluginConfigurationPage .gst-status-label { opacity: .75; }
+    .pluginConfigurationPage .gst-status-value { overflow-wrap: anywhere; }
+    .pluginConfigurationPage .gst-status-error { color: #ff9b9b; }
+
+    .pluginConfigurationPage #gstRunProgress {
+      width: 100%;
+      height: 1.2em;
+    }
+
+    .pluginConfigurationPage #stopNow {
+      background: #d32f2f !important;
+      color: #fff !important;
+      border: 0 !important;
+    }
+
+    .pluginConfigurationPage #stopNow span {
+      color: #fff !important;
+    }
+
+    .pluginConfigurationPage .gst-checkbox-setting {
+      margin: 1em 0;
+    }
+
+    .pluginConfigurationPage .gst-checkbox-setting > label.checkboxContainer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: .75em;
+      width: 100%;
+      margin: 0;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .pluginConfigurationPage .gst-checkbox-setting > label.checkboxContainer > input {
+      flex: 0 0 auto;
+      margin: 0;
+    }
+
+    .pluginConfigurationPage .gst-checkbox-setting > label.checkboxContainer > span {
+      flex: 1 1 auto;
+      display: block;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .pluginConfigurationPage .gst-checkbox-description {
+      display: block;
+      margin: .3em 0 0 2.5em;
+    }
+
+    .pluginConfigurationPage .gst-smartscan-status {
+      display: grid;
+      gap: .2em;
+      margin: .6em 0 0 2.5em;
+      font-size: .9em;
+    }
+
+    .pluginConfigurationPage .gst-smartscan-status strong {
+      font-weight: 600;
+    }
+
+    .pluginConfigurationPage #gstPathPicker {
+      width: min(48em, calc(100vw - 2em));
+      max-width: none;
+      max-height: min(85vh, 55em);
+      padding: 1.25em;
+      color: inherit;
+      background: #202020;
+      border: 1px solid #555;
+      border-radius: 8px;
+    }
+    .pluginConfigurationPage #gstPathPicker::backdrop { background: rgb(0 0 0 / 70%); }
+    .pluginConfigurationPage .gst-picker-heading,
+    .pluginConfigurationPage .gst-picker-footer { display: flex; align-items: center; justify-content: space-between; gap: .75em; }
+    .pluginConfigurationPage .gst-picker-path { overflow-wrap: anywhere; margin: .6em 0; }
+    .pluginConfigurationPage #gstPickerItems { max-height: 55vh; min-height: 10em; overflow: auto; border: 1px solid #555; border-radius: 4px; }
+    .pluginConfigurationPage .gst-picker-entry { display: block; width: 100%; padding: .65em .8em; text-align: left; border: 0; border-bottom: 1px solid #444; background: transparent; color: inherit; cursor: pointer; }
+    .pluginConfigurationPage .gst-picker-entry:hover,
+    .pluginConfigurationPage .gst-picker-entry[aria-selected="true"] { background: #164e63; }
+    .pluginConfigurationPage #gstPickerMessage { min-height: 1.5em; color: #ffb4ab; }
+  </style>
+  <div data-role="content">
+    <div class="content-primary">
+      <form id="gstConfigForm">
+        <h1>Global Subtitle Translator</h1>
+        <p>GST uses local models. When a GPU worker is enabled, only subtitle data is sent over your local network; no hosted translation service is used.</p>
+        <div class="inputContainer">
+          <input id="mediaRoot" is="emby-input" type="text" label="Media folders" />
+        </div>
+        <div class="inputContainer">
+          <input id="excludeSubs" is="emby-input" type="text" label="Skip files with subtitles in these languages" />
+          <div class="fieldDescription">The nb and no subtitle suffixes are always skipped. Add more SRT language codes separated by commas, such as en, da, dk, sv, fi. A video is skipped when a matching .&lt;code&gt;.srt file exists. Applies to automatic scans, routines, and manual scans.</div>
+        </div>
+        <div class="inputContainer">
+          <input id="minimumAcceptancePercent" is="emby-input" type="number" min="0" max="100" step="1" label="Minimum translation acceptance (%)" />
+          <div class="fieldDescription">Percentage of subtitle lines that must pass quality checks. The default of 95% allows up to 5% of lines to have warnings without stopping the translation. Serious issues are reported, but all lines are included.</div>
+        </div>
+        <div class="inputContainer">
+          <input id="excludeFilenameKeywords" is="emby-input" type="text" label="Skip filenames containing these words" />
+          <div class="fieldDescription">Files containing sample are always skipped. Add more words separated by commas, such as trailer, proof. Matching is case-insensitive.</div>
+        </div>
+        <div class="gst-checkbox-setting">
+          <label class="checkboxContainer"><input id="gpuWorkerEnabled" type="checkbox" is="emby-checkbox" /><span>Connect to a remote worker</span></label>
+          <div class="fieldDescription gst-checkbox-description">Use a GPU worker on your local network for translation. Only subtitle data is sent; video files stay on your media server. When disabled, the local CPU worker is used.</div>
+          <div id="gpuWorkerSettings" class="inputContainer" hidden>
+            <input id="gpuWorkerIp" is="emby-input" type="text" label="Worker IP address" />
+            <div class="fieldDescription">Local GPU worker. Port 8765; it accepts translation jobs only from the Jellyfin server configured on that worker.</div>
+          </div>
+        </div>
+          <div class="gst-checkbox-setting">
+          <label class="checkboxContainer">
+            <input id="includeParentheticalCaptions" type="checkbox" is="emby-checkbox" />
+            <span>Include sound effects in parentheses, such as (GASPING) and (SIGHS)</span>
+          </label>
+        </div>
+        <div class="gst-checkbox-setting">
+          <label class="checkboxContainer">
+            <input id="translateOnPlayback" type="checkbox" is="emby-checkbox" />
+            <span>Translate when a video is selected if subtitles are missing</span>
+          </label>
+        </div>
+        <div class="gst-checkbox-setting">
+          <label class="checkboxContainer">
+            <input id="translateNewFiles" type="checkbox" is="emby-checkbox" />
+            <span>Automatically translate new MKV files (Jellyfin events and Smart Scan)</span>
+          </label>
+          <div class="fieldDescription gst-checkbox-description">Smart Scan counts MKV files in enabled GST folders every minute and starts a scan when the count increases. New files must finish copying before processing.</div>
+          <div class="gst-smartscan-status" aria-live="polite">
+            <div><strong>Last checked:</strong> <span id="smartScanLastCheck">Not checked yet</span></div>
+            <div><strong>Last scanned:</strong> <span id="smartScanLastScan">No Smart Scan yet</span></div>
+          </div>
+        </div>
+        <p>Playback-triggered translation processes only the selected video. Scheduled routines scan selected folders at their configured times.</p>
+
+        <h2>GST routines</h2>
+        <p>Each routine can use its own folders and schedule. Folders are scanned recursively for <code>.mkv</code> files. GST skips up-to-date subtitles, reads text-based subtitle tracks, writes external <code>.srt</code> files, and never modifies the original MKV.</p>
+        <section class="paperList" aria-labelledby="manualScanHeading">
+          <h3 id="manualScanHeading">Scan one folder or file</h3>
+          <div class="inputContainer"><input id="manualScanDirectory" is="emby-input" type="text" label="Path on the Jellyfin server" autocomplete="off" spellcheck="false" /></div>
+          <button id="chooseManualScanPath" is="emby-button" type="button" class="raised"><span>Browse folders and files…</span></button>
+          <div class="fieldDescription">Choose a folder to scan recursively, or select one MKV file. Files with <code>.nb.srt</code> or <code>.no.srt</code>, and excluded filenames, are skipped. Translation runs locally through a GST worker; no hosted AI service is used.</div>
+          <button id="scanSelectedDirectory" is="emby-button" type="button" class="raised button-submit"><span>Start scan</span></button>
+        </section>
+        <div id="routineList"></div>
+        <div class="button-submit">
+          <button id="runNow" is="emby-button" type="button" class="raised button-submit"><span>Run now</span></button>
+          <button id="stopNow" is="emby-button" type="button" class="raised" hidden><span>Stop</span></button>
+          <button id="addRoutine" is="emby-button" type="button" class="raised"><span>Add routine</span></button>
+        </div>
+        <section id="gstRunStatus" class="paperList">
+          <div class="gst-status-heading"><h2>Translation status</h2><label class="checkboxContainer gst-debug-toggle"><input id="gstDebugToggle" type="checkbox" is="emby-checkbox" /><span>Debug</span></label></div>
+          <progress id="gstRunProgress" max="100" value="0"></progress>
+          <div class="gst-status-grid">
+            <span class="gst-status-label">Status</span><span id="gstStatusState" class="gst-status-value">Loading…</span>
+            <span class="gst-status-label">Routine</span><span id="gstStatusRoutine" class="gst-status-value">—</span>
+            <span class="gst-status-label">File being processed</span><span id="gstStatusFile" class="gst-status-value">—</span>
+            <span class="gst-status-label">Time and progress</span><span id="gstRunProgressText" class="gst-status-value">No active job</span>
+            <span class="gst-status-label">Last translated video</span><span id="gstLastTranslated" class="gst-status-value">Nothing recorded yet</span>
+            <span class="gst-status-label">Latest issue</span><span id="gstLastError" class="gst-status-value">No issues recorded</span>
+            <span class="gst-status-label gst-debug-only" hidden>Technical details</span><span id="gstDebugDetails" class="gst-status-value gst-debug-only" hidden>—</span>
+            <span class="gst-status-label gst-debug-only" hidden>Error details</span><span id="gstDebugError" class="gst-status-value gst-status-error gst-debug-only" hidden>—</span>
+          </div>
+        </section>
+        <p><small>Run now starts all enabled routines immediately. Up-to-date subtitle files are still skipped.</small></p>
+
+        <h2>Language profile</h2>
+        <div class="inputContainer">
+          <select id="source" is="emby-select" label="Source language">
+            <option value="auto">Automatic</option><option value="en">English</option><option value="es">Spanish</option><option value="de">German</option><option value="fr">French</option><option value="sv">Swedish</option><option value="da">Danish</option><option value="fi">Finnish</option>
+          </select>
+        </div>
+        <div class="inputContainer">
+          <select id="target" is="emby-select" label="Target language">
+            <option value="nb">Norwegian Bokmål</option><option value="nn">Norwegian Nynorsk</option><option value="fi">Finnish</option><option value="sv">Swedish</option><option value="da">Danish</option><option value="en">English</option><option value="de">German</option><option value="fr">French</option><option value="es">Spanish</option>
+          </select>
+        </div>
+        <button is="emby-button" type="submit" class="raised button-submit block"><span>Save</span></button>
+      </form>
+      <dialog id="gstPathPicker" aria-labelledby="gstPickerTitle">
+        <div class="gst-picker-heading">
+          <h3 id="gstPickerTitle">Choose a folder or MKV file</h3>
+          <button id="gstPickerClose" is="emby-button" type="button" class="raised"><span>Close</span></button>
+        </div>
+        <div class="inputContainer">
+          <label for="gstPickerMode">What would you like to select?</label>
+          <select id="gstPickerMode" is="emby-select">
+            <option value="directory">A folder (including subfolders)</option>
+            <option value="file">One MKV file</option>
+          </select>
+        </div>
+        <div class="gst-picker-path"><button id="gstPickerUp" is="emby-button" type="button" class="raised"><span>Go up one level</span></button> <strong id="gstPickerCurrentPath"></strong></div>
+        <div id="gstPickerMessage" role="status" aria-live="polite"></div>
+        <div id="gstPickerItems" role="listbox" aria-label="Folders and MKV files"></div>
+        <div class="gst-picker-footer">
+          <span id="gstPickerSelection"></span>
+          <button id="gstPickerChoose" is="emby-button" type="button" class="raised button-submit"><span>Select this folder</span></button>
+        </div>
+      </dialog>
+    </div>
+  </div>
+  <script>
+    (() => {
+      const page = document.querySelector('.pluginConfigurationPage');
+      if (!page || page.dataset.gstInitialized === 'true') return;
+      page.dataset.gstInitialized = 'true';
+      const pluginId = '4e3a1a30-7d1b-4f6d-a5b4-3e9f4a3c9d22';
+      const get = (object, name, fallback) => object?.[name] ?? object?.[name[0].toLowerCase() + name.slice(1)] ?? fallback;
+      const routineList = page.querySelector('#routineList');
+      let runStatusTimer;
+      let latestConfig = null;
+      let latestTask = null;
+      let pickerPath = '';
+      let pickerSelectedFile = '';
+
+      function formatDate(value) {
+        if (!value) return '';
+        const date = new Date(value);
+        return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString('en-US');
+      }
+
+      function showSmartScanTimes(config) {
+        const lastCheck = get(config, 'SmartScanLastCheckAtUtc', '');
+        const lastScan = get(config, 'LastScanAtUtc', '');
+        const lastScanSummary = get(config, 'LastScanSummary', '');
+        page.querySelector('#smartScanLastCheck').textContent = get(config, 'TranslateNewFilesAutomatically', true) !== false
+          ? (formatDate(lastCheck) || 'Waiting for first check')
+          : 'Smart Scan is disabled';
+        page.querySelector('#smartScanLastScan').textContent = lastScan
+          ? formatDate(lastScan) + (lastScanSummary ? ' · ' + lastScanSummary : '')
+          : 'No GST scan recorded yet';
+      }
+
+      function fileName(path) {
+        return String(path || '').split(/[\\/]/).filter(Boolean).pop() || '';
+      }
+
+      function pickerMode() {
+        return page.querySelector('#gstPickerMode').value;
+      }
+
+      function updatePickerChoice() {
+        const choose = page.querySelector('#gstPickerChoose');
+        const fileMode = pickerMode() === 'file';
+        choose.querySelector('span').textContent = fileMode ? 'Select this MKV file' : 'Select this folder';
+        choose.disabled = fileMode && !pickerSelectedFile;
+        page.querySelector('#gstPickerSelection').textContent = fileMode
+          ? (pickerSelectedFile ? 'Selected file: ' + fileName(pickerSelectedFile) : 'Select an MKV file from the list')
+          : 'Selected folder: ' + (fileName(pickerPath) || pickerPath);
+      }
+
+      async function loadPickerDirectory(path) {
+        const message = page.querySelector('#gstPickerMessage');
+        const items = page.querySelector('#gstPickerItems');
+        pickerPath = path || '/';
+        pickerSelectedFile = '';
+        page.querySelector('#gstPickerCurrentPath').textContent = pickerPath;
+        page.querySelector('#gstPickerUp').disabled = !path || path === '/';
+        items.replaceChildren();
+        message.textContent = 'Loading folder contents…';
+        updatePickerChoice();
+        try {
+          const url = ApiClient.getUrl('Environment/DirectoryContents', {
+            path: pickerPath,
+            includeFiles: true,
+            includeDirectories: true
+          });
+          const entries = await ApiClient.getJSON(url);
+          const visibleEntries = (entries || []).map(entry => {
+            const entryPath = get(entry, 'Path', get(entry, 'FullName', ''));
+            const type = get(entry, 'Type', '');
+            const directory = String(type).toLowerCase() === 'directory' || type === 1 || get(entry, 'IsDirectory', false) === true;
+            return { name: get(entry, 'Name', fileName(entryPath)), path: entryPath, directory };
+          }).filter(entry => entry.path && (entry.directory || /\.mkv$/i.test(entry.name)))
+            .sort((a, b) => Number(b.directory) - Number(a.directory) || a.name.localeCompare(b.name, 'en'));
+
+          for (const entry of visibleEntries) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'gst-picker-entry';
+            button.setAttribute('role', 'option');
+            button.setAttribute('aria-selected', 'false');
+            button.textContent = (entry.directory ? '📁  ' : '🎞️  ') + entry.name;
+            button.addEventListener('click', async () => {
+              if (entry.directory) {
+                await loadPickerDirectory(entry.path);
+                return;
+              }
+              if (pickerMode() !== 'file') return;
+              pickerSelectedFile = entry.path;
+              items.querySelectorAll('[role="option"]').forEach(option => option.setAttribute('aria-selected', 'false'));
+              button.setAttribute('aria-selected', 'true');
+              updatePickerChoice();
+            });
+            items.appendChild(button);
+          }
+          message.textContent = visibleEntries.length ? '' : 'This folder contains no subfolders or MKV files.';
+        } catch (error) {
+          message.textContent = 'Could not read this folder. Check that Jellyfin has access: ' + (error.message || error);
+        }
+      }
+
+      async function openPathPicker() {
+        const dialog = page.querySelector('#gstPathPicker');
+        const currentSelection = page.querySelector('#manualScanDirectory').value.trim();
+        const startPath = currentSelection && !/\.mkv$/i.test(currentSelection)
+          ? currentSelection
+          : (page.querySelector('#mediaRoot').value.trim() || '/');
+        page.querySelector('#gstPickerMode').value = 'directory';
+        await loadPickerDirectory(startPath);
+        dialog.showModal();
+      }
+
+      function durationText(totalSeconds) {
+        const seconds = Math.max(0, Math.floor(totalSeconds));
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const remainingSeconds = seconds % 60;
+        return hours > 0 ? hours + ' hr ' + String(minutes).padStart(2, '0') + ' min' : minutes + ' min ' + String(remainingSeconds).padStart(2, '0') + ' sec';
+      }
+
+      function showActivity(config, task) {
+        const running = get(config, 'IsScanRunning', false) === true || ['running', 'executing'].some(state => String(get(task, 'State', '')).toLowerCase().includes(state));
+        const file = get(config, 'CurrentFile', '') || get(task, 'CurrentProcess', '');
+        const currentIndex = Number(get(config, 'CurrentFileIndex', 0)) || 0;
+        const currentCount = Number(get(config, 'CurrentFileCount', 0)) || 0;
+        const cueIndex = Number(get(config, 'CurrentCueIndex', 0)) || 0;
+        const cueCount = Number(get(config, 'CurrentCueCount', 0)) || 0;
+        const currentProgress = Math.max(0, Math.min(100, Number(get(task, 'CurrentProgress', 0)) || 0));
+        const completedFiles = Math.max(0, currentIndex - (running ? 1 : 0));
+        const inFileProgress = cueCount > 0 ? cueIndex / cueCount : 0;
+        const fileProgress = currentCount > 0
+          ? Math.max(0, Math.min(100, (completedFiles + (running ? inFileProgress : 0)) * 100 / currentCount))
+          : currentProgress;
+        const debug = page.querySelector('#gstDebugToggle').checked;
+        const startedAt = get(config, 'CurrentScanStartedAtUtc', '');
+        const elapsedSeconds = startedAt ? Math.max(0, (Date.now() - new Date(startedAt).getTime()) / 1000) : 0;
+        const etaSeconds = fileProgress > 0 && fileProgress < 100 ? elapsedSeconds * (100 - fileProgress) / fileProgress : 0;
+        page.querySelector('#gstStatusState').textContent = running ? 'Running' : 'Idle';
+        page.querySelector('#gstStatusRoutine').textContent = get(config, 'CurrentRoutine', '') || (running ? 'GST routine' : '—');
+        page.querySelector('#gstStatusFile').textContent = running ? fileName(file) || 'Preparing…' : '—';
+        const elapsedText = startedAt ? 'Started ' + formatDate(startedAt) + ' · Elapsed ' + durationText(elapsedSeconds) : '';
+        const etaClock = etaSeconds > 0 ? new Date(Date.now() + etaSeconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+        const etaText = etaSeconds > 0 ? ' · ETA ' + etaClock + ' (' + durationText(etaSeconds) + ')' : (running ? ' · Calculating ETA…' : '');
+        page.querySelector('#gstRunProgressText').textContent = running
+          ? (get(config, 'CurrentStage', '') || 'Working') + ' · ' + Math.round(fileProgress) + ' %' + (elapsedText ? ' · ' + elapsedText : '') + etaText
+          : 'No active job';
+        page.querySelector('#gstRunProgress').value = running ? fileProgress : 0;
+        page.querySelector('#stopNow').hidden = !running;
+
+        const lastFile = get(config, 'LastTranslatedFile', '');
+        const lastAt = formatDate(get(config, 'LastTranslatedAtUtc', ''));
+        page.querySelector('#gstLastTranslated').textContent = lastFile ? fileName(lastFile) + (lastAt ? ' · ' + lastAt : '') : 'Nothing recorded yet';
+        const errorFile = get(config, 'LastErrorFile', '');
+        const errorAt = formatDate(get(config, 'LastErrorAtUtc', ''));
+        const errorMessage = get(config, 'LastErrorMessage', '');
+        const errorNode = page.querySelector('#gstLastError');
+        errorNode.textContent = errorFile ? 'Could not translate ' + fileName(errorFile) + '. Enable Debug for details.' : 'No issues recorded';
+        errorNode.classList.toggle('gst-status-error', Boolean(errorFile));
+        page.querySelector('#gstDebugDetails').textContent = [file || '', 'File ' + currentIndex + ' of ' + currentCount, 'Subtitles ' + cueIndex + ' of ' + cueCount, 'Stage: ' + (get(config, 'CurrentStage', '') || '—')].join(' · ');
+        page.querySelector('#gstDebugError').textContent = errorFile ? errorFile + (errorAt ? ' · ' + errorAt : '') + (errorMessage ? ' · ' + errorMessage : '') : 'No technical error details';
+        page.querySelectorAll('.gst-debug-only').forEach(node => { node.hidden = !debug; });
+      }
+
+      function cleanLanguageOptions() {
+        page.querySelectorAll('#source option, #target option').forEach(option => {
+          if (option.textContent.trim() === 'x[1]') option.remove();
+        });
+      }
+
+      function addRoutine(routine = {}) {
+        const row = document.createElement('div');
+        row.className = 'gst-routine paperList';
+        row.dataset.id = get(routine, 'Id', crypto.randomUUID());
+        row.innerHTML = `
+          <div class="inputContainer"><input class="routineName" is="emby-input" type="text" label="Routine name" /></div>
+          <div class="inputContainer"><input class="routineTime" is="emby-input" type="time" label="Run at" /></div>
+          <div class="inputContainer"><textarea class="routineDirectories" is="emby-input" rows="3" label="Folders to scan (one per line)"></textarea><div class="fieldDescription">Example: /media/movies or /media/tv shows</div></div>
+          <label class="checkboxContainer"><input class="routineEnabled" type="checkbox" is="emby-checkbox" /><span>Enable routine</span></label>
+          <button class="removeRoutine" is="emby-button" type="button"><span>Remove routine</span></button>`;
+        row.querySelector('.routineName').value = get(routine, 'Name', 'New GST routine');
+        row.querySelector('.routineTime').value = get(routine, 'Time', '03:00');
+        row.querySelector('.routineDirectories').value = (get(routine, 'Directories', []) || []).join('\n');
+        row.querySelector('.routineEnabled').checked = get(routine, 'Enabled', true) !== false;
+        row.querySelector('.removeRoutine').addEventListener('click', () => row.remove());
+        routineList.appendChild(row);
+      }
+
+      function renderRoutines(config) {
+        routineList.innerHTML = '';
+        const routines = get(config, 'ScanRoutines', []) || [];
+        if (routines.length > 0) {
+          routines.forEach(addRoutine);
+          return;
+        }
+        addRoutine({ Name: 'Movies and TV', Time: '03:00', Directories: get(config, 'ScanDirectories', ['/media']), Enabled: true });
+      }
+
+      function readRoutines() {
+        return Array.from(routineList.querySelectorAll('.gst-routine')).map(row => ({
+          Id: row.dataset.id,
+          Name: row.querySelector('.routineName').value.trim() || 'GST-rutine',
+          Time: row.querySelector('.routineTime').value || '03:00',
+          Directories: row.querySelector('.routineDirectories').value.split(/\r?\n/).map(value => value.trim()).filter(Boolean),
+          Enabled: row.querySelector('.routineEnabled').checked
+        }));
+      }
+
+      async function updateRunStatus() {
+        try {
+          const tasks = await ApiClient.getScheduledTasks();
+          const task = tasks.find(item => get(item, 'Key', '') === 'GlobalSubtitleTranslatorScan');
+          const config = await ApiClient.getPluginConfiguration(pluginId);
+          latestConfig = config;
+          latestTask = task;
+          showActivity(config, task);
+          showSmartScanTimes(config);
+        } catch (error) {
+          console.warn('GST status kunne ikke leses', error);
+        } finally {
+          runStatusTimer = setTimeout(updateRunStatus, 2500);
+        }
+      }
+
+      async function loadConfig() {
+        cleanLanguageOptions();
+        const config = await ApiClient.getPluginConfiguration(pluginId);
+        page.querySelector('#mediaRoot').value = get(config, 'MediaRoot', '/media');
+        page.querySelector('#manualScanDirectory').value = get(config, 'ManualScanDirectory', '');
+        page.querySelector('#gpuWorkerEnabled').checked = get(config, 'GpuWorkerEnabled', false) === true;
+        page.querySelector('#gpuWorkerIp').value = get(config, 'GpuWorkerIp', '');
+        page.querySelector('#gpuWorkerSettings').hidden = !page.querySelector('#gpuWorkerEnabled').checked;
+        const excludedSubs = get(config, 'ExcludedSubtitleLanguages', []);
+        const excludedValues = Array.isArray(excludedSubs) ? excludedSubs : String(excludedSubs || '').split(/[,;\s]+/);
+        page.querySelector('#excludeSubs').value = Array.from(new Set(['nb', 'no', ...excludedValues.map(value => String(value).trim().toLowerCase()).filter(Boolean)])).join(', ');
+        page.querySelector('#minimumAcceptancePercent').value = Math.max(0, Math.min(100, Number(get(config, 'MinimumAcceptancePercent', 95)) || 0));
+        const excludedKeywords = get(config, 'ExcludedFilenameKeywords', []);
+        const keywordValues = Array.isArray(excludedKeywords) ? excludedKeywords : String(excludedKeywords || '').split(/[,;]+/);
+        page.querySelector('#excludeFilenameKeywords').value = Array.from(new Set(['sample', ...keywordValues.map(value => String(value).trim().toLowerCase()).filter(Boolean)])).join(', ');
+        page.querySelector('#includeParentheticalCaptions').checked = get(config, 'IncludeParentheticalCaptions', false) === true;
+        page.querySelector('#translateOnPlayback').checked = get(config, 'TranslateOnPlaybackRequest', true) !== false;
+        page.querySelector('#translateNewFiles').checked = get(config, 'TranslateNewFilesAutomatically', true) !== false;
+        page.querySelector('#gstDebugToggle').checked = get(config, 'ShowDebugInfo', false) === true;
+        const profile = (get(config, 'Profiles', []) || [])[0] || {};
+        page.querySelector('#source').value = get(profile, 'SourceLanguage', 'auto');
+        page.querySelector('#target').value = get(profile, 'TargetLanguage', 'nb');
+        renderRoutines(config);
+        showActivity(config, null);
+        showSmartScanTimes(config);
+        clearTimeout(runStatusTimer);
+        updateRunStatus();
+        cleanLanguageOptions();
+      }
+
+      page.querySelector('#addRoutine').addEventListener('click', () => addRoutine());
+      page.querySelector('#chooseManualScanPath').addEventListener('click', openPathPicker);
+      page.querySelector('#gstPickerClose').addEventListener('click', () => page.querySelector('#gstPathPicker').close());
+      page.querySelector('#gstPickerMode').addEventListener('change', () => {
+        pickerSelectedFile = '';
+        loadPickerDirectory(pickerPath);
+      });
+      page.querySelector('#gstPickerUp').addEventListener('click', async () => {
+        try {
+          const parentPath = await ApiClient.getJSON(ApiClient.getUrl('Environment/ParentPath', { path: pickerPath }));
+          if (parentPath) await loadPickerDirectory(parentPath);
+          else page.querySelector('#gstPickerUp').disabled = true;
+        } catch (error) {
+          page.querySelector('#gstPickerMessage').textContent = 'Could not open the parent folder: ' + (error.message || error);
+        }
+      });
+      page.querySelector('#gstPickerChoose').addEventListener('click', () => {
+        const selected = pickerMode() === 'file' ? pickerSelectedFile : pickerPath;
+        if (!selected) return;
+        page.querySelector('#manualScanDirectory').value = selected;
+        page.querySelector('#gstPathPicker').close();
+      });
+      page.querySelector('#scanSelectedDirectory').addEventListener('click', async () => {
+        const button = page.querySelector('#scanSelectedDirectory');
+        const selectedPath = page.querySelector('#manualScanDirectory').value.trim();
+        if (!selectedPath) {
+          Dashboard.alert('Select a folder or MKV file on the Jellyfin server first');
+          return;
+        }
+        button.disabled = true;
+        try {
+          await saveFormConfiguration();
+          const tasks = await ApiClient.getScheduledTasks();
+          const task = tasks.find(item => get(item, 'Key', '') === 'GlobalSubtitleTranslatorOneOffScan');
+          if (!task) throw new Error('The GST folder scan task was not found');
+          await ApiClient.ajax({
+            type: 'POST',
+            url: ApiClient.getUrl('ScheduledTasks/Running/' + get(task, 'Id', ''))
+          });
+          Dashboard.alert('The scan has started. Files with Norwegian subtitles will be skipped.');
+          page.querySelector('#gstRunStatus').hidden = false;
+          page.querySelector('#gstRunProgress').value = 0;
+          page.querySelector('#gstRunProgressText').textContent = 'Folder scan starting…';
+          clearTimeout(runStatusTimer);
+          updateRunStatus();
+        } catch (error) {
+          console.error('GST could not start folder scan', error);
+          Dashboard.alert('GST could not start the scan: ' + (error.message || error));
+        } finally {
+          button.disabled = false;
+        }
+      });
+      page.querySelector('#runNow').addEventListener('click', async () => {
+        const button = page.querySelector('#runNow');
+        button.disabled = true;
+        try {
+          const tasks = await ApiClient.getScheduledTasks();
+          const task = tasks.find(item => get(item, 'Key', '') === 'GlobalSubtitleTranslatorScan');
+          if (!task) throw new Error('The GST task was not found');
+          await ApiClient.ajax({
+            type: 'POST',
+            url: ApiClient.getUrl('ScheduledTasks/Running/' + get(task, 'Id', ''))
+          });
+          Dashboard.alert('GST routines started');
+          page.querySelector('#gstRunStatus').hidden = false;
+          page.querySelector('#gstRunProgress').value = 0;
+          page.querySelector('#gstRunProgressText').textContent = 'GST starting…';
+          clearTimeout(runStatusTimer);
+          updateRunStatus();
+        } catch (error) {
+          console.error('GST could not be started manually', error);
+          Dashboard.alert('GST could not be started');
+        } finally {
+          button.disabled = false;
+        }
+      });
+      page.querySelector('#stopNow').addEventListener('click', async () => {
+        const button = page.querySelector('#stopNow');
+        button.disabled = true;
+        try {
+          const tasks = await ApiClient.getScheduledTasks();
+          const runningTasks = tasks.filter(item => ['GlobalSubtitleTranslatorScan', 'GlobalSubtitleTranslatorOneOffScan'].includes(get(item, 'Key', '')) && String(get(item, 'State', '')).toLowerCase().includes('running'));
+          if (runningTasks.length === 0) throw new Error('No GST scan is running');
+          await Promise.all(runningTasks.map(task => ApiClient.ajax({
+            type: 'DELETE',
+            url: ApiClient.getUrl('ScheduledTasks/Running/' + get(task, 'Id', ''))
+          })));
+          page.querySelector('#gstRunProgressText').textContent = 'Stopping GST routines…';
+          Dashboard.alert('Stopping GST routines');
+          setTimeout(updateRunStatus, 500);
+        } catch (error) {
+          console.error('GST could not be stopped', error);
+          Dashboard.alert('GST could not be stopped');
+        } finally {
+          button.disabled = false;
+        }
+      });
+      page.addEventListener('pageshow', loadConfig);
+      page.querySelector('#gstDebugToggle').addEventListener('change', () => {
+        if (latestConfig) showActivity(latestConfig, latestTask);
+      });
+      page.querySelector('#gpuWorkerEnabled').addEventListener('change', event => {
+        page.querySelector('#gpuWorkerSettings').hidden = !event.target.checked;
+      });
+      loadConfig();
+      async function saveFormConfiguration() {
+        const config = await ApiClient.getPluginConfiguration(pluginId);
+        const routines = readRoutines();
+        config.MediaRoot = page.querySelector('#mediaRoot').value;
+        config.ManualScanDirectory = page.querySelector('#manualScanDirectory').value.trim();
+        config.GpuWorkerEnabled = page.querySelector('#gpuWorkerEnabled').checked;
+        config.GpuWorkerIp = page.querySelector('#gpuWorkerIp').value.trim();
+        config.ExcludedSubtitleLanguages = Array.from(new Set(['nb', 'no', ...page.querySelector('#excludeSubs').value.split(/[,;\s]+/).map(value => value.trim().toLowerCase()).filter(Boolean)]));
+        config.MinimumAcceptancePercent = Math.max(0, Math.min(100, Math.round(Number(page.querySelector('#minimumAcceptancePercent').value) || 0)));
+        config.ExcludedFilenameKeywords = Array.from(new Set(['sample', ...page.querySelector('#excludeFilenameKeywords').value.split(/[,;]+/).map(value => value.trim().toLowerCase()).filter(Boolean)]));
+        config.ScanRoutines = routines;
+        config.ScanDirectories = routines.flatMap(routine => routine.Directories);
+        config.IncludeParentheticalCaptions = page.querySelector('#includeParentheticalCaptions').checked;
+        config.TranslateOnPlaybackRequest = page.querySelector('#translateOnPlayback').checked;
+        config.TranslateNewFilesAutomatically = page.querySelector('#translateNewFiles').checked;
+        config.ShowDebugInfo = page.querySelector('#gstDebugToggle').checked;
+        config.Profiles = [{ Name: 'Custom', SourceLanguage: page.querySelector('#source').value, TargetLanguage: page.querySelector('#target').value, Enabled: true }];
+        await ApiClient.updatePluginConfiguration(pluginId, config);
+        latestConfig = config;
+        return config;
+      }
+      page.querySelector('#gstConfigForm').addEventListener('submit', async e => {
+        e.preventDefault();
+        await saveFormConfiguration();
+        Dashboard.alert('Saved');
+      });
+    })();
+  </script>
+</div>
+
