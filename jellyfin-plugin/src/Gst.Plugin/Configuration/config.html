@@ -241,6 +241,7 @@
       let latestTask = null;
       let pickerPath = '';
       let pickerSelectedFile = '';
+      let pickerTarget = null;
 
       function formatDate(value) {
         if (!value) return '';
@@ -329,9 +330,11 @@
         }
       }
 
-      async function openPathPicker() {
+      async function openPathPicker(target = page.querySelector('#manualScanDirectory')) {
         const dialog = page.querySelector('#gstPathPicker');
-        const currentSelection = page.querySelector('#manualScanDirectory').value.trim();
+        pickerTarget = target;
+        const targetValues = target.value.split(/\r?\n/).map(value => value.trim()).filter(Boolean);
+        const currentSelection = targetValues[targetValues.length - 1] || '';
         const startPath = currentSelection && !/\.mkv$/i.test(currentSelection)
           ? currentSelection
           : (page.querySelector('#mediaRoot').value.trim() || '/');
@@ -404,13 +407,17 @@
         row.innerHTML = `
           <div class="inputContainer"><input class="routineName" is="emby-input" type="text" label="Routine name" /></div>
           <div class="inputContainer"><input class="routineTime" is="emby-input" type="time" label="Run at" /></div>
-          <div class="inputContainer"><textarea class="routineDirectories" is="emby-input" rows="3" label="Folders to scan (one per line)"></textarea><div class="fieldDescription">Example: /media/movies or /media/tv shows</div></div>
+          <div class="inputContainer"><textarea class="routineDirectories" is="emby-input" rows="3" label="Folders to scan (one per line)"></textarea><div class="fieldDescription">Add one folder per line. Each folder is scanned recursively.</div><button class="browseRoutineFolders raised" is="emby-button" type="button"><span>Browse folders and files…</span></button></div>
           <label class="checkboxContainer"><input class="routineEnabled" type="checkbox" is="emby-checkbox" /><span>Enable routine</span></label>
           <button class="removeRoutine" is="emby-button" type="button"><span>Remove routine</span></button>`;
         row.querySelector('.routineName').value = get(routine, 'Name', 'New GST routine');
         row.querySelector('.routineTime').value = get(routine, 'Time', '03:00');
         row.querySelector('.routineDirectories').value = (get(routine, 'Directories', []) || []).join('\n');
         row.querySelector('.routineEnabled').checked = get(routine, 'Enabled', true) !== false;
+        row.querySelector('.browseRoutineFolders').addEventListener('click', event => {
+          event.preventDefault();
+          openPathPicker(row.querySelector('.routineDirectories'));
+        });
         row.querySelector('.removeRoutine').addEventListener('click', () => row.remove());
         routineList.appendChild(row);
       }
@@ -500,7 +507,16 @@
       page.querySelector('#gstPickerChoose').addEventListener('click', () => {
         const selected = pickerMode() === 'file' ? pickerSelectedFile : pickerPath;
         if (!selected) return;
-        page.querySelector('#manualScanDirectory').value = selected;
+        if (pickerTarget && pickerTarget.classList.contains('routineDirectories')) {
+          const directories = pickerTarget.value.split(/\r?\n/).map(value => value.trim()).filter(Boolean);
+          if (!directories.some(directory => directory === selected)) {
+            directories.push(selected);
+          }
+          pickerTarget.value = directories.join('\n');
+        } else {
+          page.querySelector('#manualScanDirectory').value = selected;
+        }
+        pickerTarget = null;
         page.querySelector('#gstPathPicker').close();
       });
       page.querySelector('#scanSelectedDirectory').addEventListener('click', async () => {

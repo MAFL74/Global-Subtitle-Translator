@@ -1,21 +1,21 @@
 [
   {
-  "guid": "4e3a1a30-7d1b-4f6d-a5b4-3e9f4a3c9d22",
-  "name": "Global Subtitle Translator",
-  "description": "Extracts text subtitles from MKV files and translates them with a locally hosted model.",
-  "overview": "Local offline subtitle translation for Jellyfin.",
-  "owner": "MAFL74",
-  "category": "General",
-  "imageUrl": "https://raw.githubusercontent.com/MAFL74/Global-Subtitle-Translator/refs/heads/main/assets/gst-logo-v4.png",
-  "versions": [
-    {
-      "version": "1.5.22.0",
-      "changelog": "Publish the existing Jellyfin plugin build with repository metadata.",
-      "targetAbi": "12.3.0.0",
-      "sourceUrl": "https://raw.githubusercontent.com/MAFL74/Global-Subtitle-Translator/main/releases/Global-Subtitle-Translator_1.5.22.0.zip",
-      "checksum": "15c2e5ca223e41bab173aa66987b5210",
-      "timestamp": "2026-11-25T20:53:00Z"
-    }
-  ]
+    "guid": "4e3a1a30-7d1b-4f6d-a5b4-3e9f4a3c9d22",
+    "name": "Global Subtitle Translator",
+    "description": "Extracts text subtitles from MKV files and translates them with a locally hosted model.",
+    "overview": "Local offline subtitle translation for Jellyfin.",
+    "owner": "MAFL74",
+    "category": "General",
+    "imageUrl": "https://raw.githubusercontent.com/MAFL74/Global-Subtitle-Translator/refs/heads/main/assets/gst-logo-v4.png",
+    "versions": [
+      {
+        "version": "1.5.23.0",
+        "changelog": "Adds the Jellyfin folder browser to scheduled GST routines.",
+        "targetAbi": "12.3.0.0",
+        "sourceUrl": "https://raw.githubusercontent.com/MAFL74/Global-Subtitle-Translator/main/releases/Global-Subtitle-Translator_1.5.23.0.zip",
+        "checksum": "9176d8eec1f30670a098ac11e7434d51",
+        "timestamp": "2026-11-25T21:35:39Z"
+      }
+    ]
   }
 ]

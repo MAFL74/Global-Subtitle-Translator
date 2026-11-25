@@ -1,15 +1,16 @@
 {
   "category": "General",
-  "changelog": "Initial public source release preparation.",
+  "changelog": "Adds a Jellyfin folder browser to scheduled GST routines.",
   "description": "Extracts text subtitles from MKV files and translates them with a locally hosted model.",
   "guid": "4e3a1a30-7d1b-4f6d-a5b4-3e9f4a3c9d22",
   "name": "Global Subtitle Translator",
   "overview": "Local subtitle translation for Jellyfin.",
   "owner": "MAFL74",
   "targetAbi": "12.3.0.0",
-  "version": "1.5.22.0",
+  "version": "1.5.23.0",
   "assemblies": [
     "Jellyfin.Plugin.GlobalSubtitleTranslator.dll",
     "Gst.Core.dll"
-  ]
+  ],
+  "timestamp": "2026-11-25T21:35:39Z"
 }

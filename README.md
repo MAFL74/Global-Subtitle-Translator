@@ -1,6 +1,6 @@
 # Global Subtitle Translator
 
-Global Subtitle Translator (GST) is a Jellyfin plugin and companion Windows app for translating text-based subtitle tracks with locally stored translation models. The Jellyfin plugin source in this snapshot is version 1.5.22.0.
+Global Subtitle Translator (GST) is a Jellyfin plugin and companion Windows app for translating text-based subtitle tracks with locally stored translation models. The Jellyfin plugin source in this snapshot is version 1.5.23.0.
 
 ## Repository layout
 
@@ -36,7 +36,7 @@ Add this manifest in Jellyfin Dashboard → Plugins → Repositories:
 https://raw.githubusercontent.com/MAFL74/Global-Subtitle-Translator/refs/heads/main/manifest-v4.json
 ```
 
-After saving the repository, refresh the plugin catalog. Jellyfin can then show the plugin owner and repository and resolve package details for GST. The repository contains a Jellyfin package for version 1.5.22.0 under `releases/`.
+After saving the repository, refresh the plugin catalog. Jellyfin can then show the plugin owner and repository and resolve package details for GST. The repository contains a Jellyfin package for version 1.5.23.0 under `releases/`.
 
 ## Run the Windows app
 
